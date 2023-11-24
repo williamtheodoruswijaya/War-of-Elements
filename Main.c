@@ -17,11 +17,50 @@ struct userData{
 }*head[TABLE_SIZE], *tail[TABLE_SIZE];
 
 void mainMenu(char username[], int score){
+	int loop = 1;
+	while(loop == 1){
+		clearScreen();
+		printf("Welcome, %s...\n\n", username);
+		puts("1. Play");
+		puts("2. View Score");
+		puts("3. Exit");
+		printf(">> ");
+		int operation;
+		scanf("%d", &operation);
+		switch(operation){
+			case 1:
+				break;
+			case 2:
+				viewAll();
+				getchar();
+				getchar();
+				break;
+			case 3:
+				popAll(); // hapus semua isi dari hashMap biar ga nimpa
+				loop = 0;
+				break;
+			default:
+				break;
+		}
+	}
+}
+
+void viewAll(){
 	clearScreen();
-	printf("Welcome, %s...\n\n", username);
-	puts("1. Play");
-	puts("2. View Score");
-	puts("3. Exit");
+	int i;
+	printf("==========================================\n");
+	printf("|| Score   || Username                  ||\n");
+	printf("==========================================\n");
+	for(i = 0; i < TABLE_SIZE; i++){
+		struct userData* curr = head[i];
+		if(head[i] != NULL){
+			while(curr != NULL){
+				printf("||%-9d||%-27s||\n", curr->score, curr->username);
+				printf("==========================================\n");
+				curr = curr->next;
+			}
+		}
+	}
 }
 
 int main(){
@@ -39,7 +78,7 @@ int main(){
     	puts("  \\    `  ___   ~~~~~~~~~~~~~~~~~~~~~~~");
     	puts("========================================");
     	puts("\n");
-    	puts("Battle of New York\n");
+    	puts("Culling Game\n");
     	puts("1. Login");
     	puts("2. Sign up");
     	puts("3. Exit");
@@ -50,11 +89,9 @@ int main(){
         	case 1:
 				loginMenu();
 				getchar();
-				getchar();
             	break;
         	case 2:
 				signUpMenu();
-				getchar();
 				getchar();
             	break;
         	case 3:
@@ -80,10 +117,14 @@ void loginMenu(){
 	char password[21];
 	char userPassword[21];
 	int valid, score;
-
+	printf("Enter 0 to return to cancel!\n\n");
+	
 	do{
 		printf("Username: ");
 		scanf(" %[^\n]", username);
+		if(strcmp(username, "0") == 0){
+			return;
+		}
 		readFile(); // mindahin isi file ke hashTable
 		// Accessing hash table based on the first letter
 		int index = username[0] - 'a';
@@ -107,6 +148,9 @@ void loginMenu(){
 	do{
 		printf("Password: ");
 		scanf(" %[^\n]", password);
+		if(strcmp(password, "0") == 0){
+			return;
+		}
 		if(strcmp(password, userPassword) != 0){
 			printf("\033[1;31mWrong password!\033[0m\ ");
 			printf("\n");
@@ -124,12 +168,15 @@ void signUpMenu(){
 	char username[51];
 	char password[21];
 	int valid, i, length;
-
+	printf("Enter 0 to return to cancel!\n\n");
 	do{
 		valid = 1;
 		length = 0;
 		printf("Username: ");
 		scanf(" %[^\n]", username);
+		if(strcmp(username, "0") == 0){
+			return;
+		}
 		if(strcmp(username, "") == 0){
 			printf("\033[1;31mUsername can't be empty!\033[0m\ ");
 			printf("\n");
@@ -170,6 +217,9 @@ void signUpMenu(){
 		length = 0;
 		printf("Password: ");
 		scanf(" %[^\n]", password);
+		if(strcmp(password, "0") == 0){
+			return;
+		}
 		if(strcmp(password, "") == 0){
 			printf("\033[1;31mPassword can't be empty!\033[0m\ ");
 			printf("\n");
@@ -288,4 +338,25 @@ void readFile(){
 		insertData(username, password, score);
 	}
 	fclose(outputFile);
+}
+
+void popAll(){
+	int i;
+	for(i = 0; i < TABLE_SIZE; i++){
+		while(head[i] != NULL){
+			if(head[i] == tail[i]){
+				struct userData* temp = head[i];
+				head[i] = NULL;
+				tail[i] = NULL;
+				free(temp);
+			}
+			else{
+				struct userData* temp = head[i];
+				head[i] = head[i]->next;
+				temp->next = NULL;
+				head[i]->prev = NULL;
+				free(temp);
+			}
+		}
+	}
 }
