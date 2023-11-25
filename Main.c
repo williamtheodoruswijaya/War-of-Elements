@@ -22,20 +22,26 @@ void mainMenu(char username[], int score){
 		clearScreen();
 		printf("Welcome, %s...\n\n", username);
 		puts("1. Play");
-		puts("2. View Score");
-		puts("3. Exit");
+		puts("2. Tutorial");
+		puts("3. View Score");
+		puts("4. Exit");
 		printf(">> ");
 		int operation;
 		scanf("%d", &operation);
 		switch(operation){
 			case 1:
+				getchar();
 				break;
 			case 2:
+				tutorialMenu();
+				getchar();
+				break;
+			case 3:
 				viewAll();
 				getchar();
 				getchar();
 				break;
-			case 3:
+			case 4:
 				popAll(); // hapus semua isi dari hashMap biar ga nimpa
 				loop = 0;
 				break;
@@ -45,22 +51,38 @@ void mainMenu(char username[], int score){
 	}
 }
 
-void viewAll(){
+void tutorialMenu(){
 	clearScreen();
-	int i;
-	printf("==========================================\n");
-	printf("|| Score   || Username                  ||\n");
-	printf("==========================================\n");
-	for(i = 0; i < TABLE_SIZE; i++){
-		struct userData* curr = head[i];
-		if(head[i] != NULL){
-			while(curr != NULL){
-				printf("||%-9d||%-27s||\n", curr->score, curr->username);
-				printf("==========================================\n");
-				curr = curr->next;
+}
+
+void viewAll(){
+	int loop = 1;
+	do{
+		clearScreen();
+		int i;
+		printf("==========================================\n");
+		printf("|| Score   || Username                  ||\n");
+		printf("==========================================\n");
+		for(i = 0; i < TABLE_SIZE; i++){
+			struct userData* curr = head[i];
+			if(head[i] != NULL){
+				while(curr != NULL){
+					printf("|| %-8d||%-27s||\n", curr->score, curr->username);
+					printf("==========================================\n");
+					curr = curr->next;
+				}
 			}
 		}
-	}
+		printf("\nEnter the username you want to search: [enter 0 to exit!]\n");
+		printf(">> ");
+		char username[51];
+		scanf(" %[^\n]", username);
+		if(strcmp(username, "0") == 0){
+			loop = 0;
+		}
+		searchUsername(username);
+	} while(loop == 1);
+	return;
 }
 
 int main(){
@@ -359,4 +381,24 @@ void popAll(){
 			}
 		}
 	}
+}
+
+void searchUsername(char username[]){
+	clearScreen();
+	int index = username[0] - 'a';
+	struct userData* curr = head[index];
+
+	int found = 0;
+	while(curr != NULL){
+		if(strcmp(username, curr->username) == 0){
+			printf("Username: %s\n", curr->username);
+			printf("Score: %d\n", curr->score);
+			found = 1;
+			break;
+		}
+	}
+	if(found == 0){
+		printf("There is no username with that name!\n");
+	}
+	return;
 }
