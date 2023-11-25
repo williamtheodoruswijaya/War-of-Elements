@@ -39,7 +39,6 @@ void mainMenu(char username[], int score){
 			case 3:
 				viewAll();
 				getchar();
-				getchar();
 				break;
 			case 4:
 				popAll(); // hapus semua isi dari hashMap biar ga nimpa
@@ -80,7 +79,10 @@ void viewAll(){
 		if(strcmp(username, "0") == 0){
 			loop = 0;
 		}
-		searchUsername(username);
+		else{
+			searchUsername(username);
+			getchar();
+		}
 	} while(loop == 1);
 	return;
 }
@@ -400,5 +402,7 @@ void searchUsername(char username[]){
 	if(found == 0){
 		printf("There is no username with that name!\n");
 	}
+	printf("Press ENTER to continue!\n");
+	getchar();
 	return;
 }
