@@ -398,6 +398,7 @@ void searchUsername(char username[]){
 			found = 1;
 			break;
 		}
+		curr = curr->next;
 	}
 	if(found == 0){
 		printf("There is no username with that name!\n");
