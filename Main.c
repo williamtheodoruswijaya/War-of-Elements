@@ -16,6 +16,24 @@ struct userData{
 	struct userData* next;
 }*head[TABLE_SIZE], *tail[TABLE_SIZE];
 
+struct ClassPlayer{
+	char name[51];
+	int hp;
+	int mp;
+	int atk;
+	int def;
+};
+
+struct ClassEnemy{
+	int ID;
+	char name[51];
+	char elements[51];
+	int hp;
+	int mp;
+	int atk;
+	int def;
+};
+
 void mainMenu(char username[], int score){
 	int loop = 1;
 	while(loop == 1){
@@ -37,7 +55,7 @@ void mainMenu(char username[], int score){
 				getchar();
 				break;
 			case 3:
-				viewAll();
+				viewScore();
 				getchar();
 				break;
 			case 4:
@@ -52,39 +70,14 @@ void mainMenu(char username[], int score){
 
 void tutorialMenu(){
 	clearScreen();
-}
-
-void viewAll(){
-	int loop = 1;
-	do{
-		clearScreen();
-		int i;
-		printf("==========================================\n");
-		printf("|| Score   || Username                  ||\n");
-		printf("==========================================\n");
-		for(i = 0; i < TABLE_SIZE; i++){
-			struct userData* curr = head[i];
-			if(head[i] != NULL){
-				while(curr != NULL){
-					printf("|| %-8d||%-27s||\n", curr->score, curr->username);
-					printf("==========================================\n");
-					curr = curr->next;
-				}
-			}
-		}
-		printf("\nEnter the username you want to search: [enter 0 to exit!]\n");
-		printf(">> ");
-		char username[51];
-		scanf(" %[^\n]", username);
-		if(strcmp(username, "0") == 0){
-			loop = 0;
-		}
-		else{
-			searchUsername(username);
-			getchar();
-		}
-	} while(loop == 1);
-	return;
+	int i;
+	char messages[] = "Welcome to the tutorial!\nI'm Rydia, the tutorial bot!\nToday, I will teach you how to play this game!\n\n";
+	for(i = 0; messages[i] != '\0'; i++){
+		printf("%c", messages[i]);
+		usleep(75000);
+	}
+	printf("\nPress Enter to continue!\n");
+	getchar();
 }
 
 int main(){
@@ -164,6 +157,7 @@ void loginMenu(){
 			curr = curr->next;
 		}
 		if(valid == 0){
+			popAll();
 			printf("\033[1;31mUsername is not available!\033[0m\ ");
 			printf("\n");
 		}
@@ -307,7 +301,7 @@ void insertData(char username[], char password[], int score){
 	node->next = NULL;
 
 	int index = username[0] - 'a';
-	//pushTail
+	// ini pushTail
 	if(head[index] == NULL){
 		head[index] = node;
 		tail[index] = node;
@@ -405,5 +399,68 @@ void searchUsername(char username[]){
 	}
 	printf("\nPress ENTER to continue!\n");
 	getchar();
+	return;
+}
+
+void viewScore(){
+	int i = 0, j = 0;
+	clearScreen();
+
+	int Arraysize = 0;
+	for(i = 0; i < TABLE_SIZE; i++){
+		struct userData* curr = head[i];
+		if(head[i] != NULL){
+			while(curr != NULL){
+				Arraysize++;
+				curr = curr->next;
+			}
+		}
+	} // Ini buat dapet size array
+
+	struct userData* arr[Arraysize];
+	for(i = 0; i < TABLE_SIZE; i++){
+		struct userData* curr = head[i];
+		if(head[i] != NULL){
+			while(curr != NULL){
+				arr[j] = curr;
+				j++;
+				curr = curr->next;
+			}
+		}
+	} // Ini buat mindahin semua hash table ke dalam satu array
+
+	for(i = 0; i < Arraysize; i++){
+		for(j = 0; j < Arraysize-1-i; j++){
+			if(arr[j]->score < arr[j+1]->score){
+				struct userData* temp = arr[j];
+				arr[j] = arr[j+1];
+				arr[j+1] = temp;
+			}
+		}
+	} // Ini BubbleSort buat sorting array berdasarkan score
+
+	int loop = 1;
+	do{
+		clearScreen();
+		printf("==========================================\n");
+		printf("|| Score   || Username                  ||\n");
+		printf("==========================================\n");
+		for(i = 0; i < Arraysize; i++){
+			printf("|| %-8d||%-27s||\n", arr[i]->score, arr[i]->username);
+			printf("==========================================\n");
+		}
+		printf("\nEnter the username you want to search: [enter 0 to exit!]\n");
+		printf(">> ");
+		char username[51];
+		scanf(" %[^\n]", username);
+		if(strcmp(username, "0") == 0){
+			loop = 0;
+		}
+		else{
+			searchUsername(username);
+			getchar();
+		}
+	} while(loop == 1);
+	// Ini buat liat score leaderboard
 	return;
 }
