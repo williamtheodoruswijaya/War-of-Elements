@@ -403,7 +403,7 @@ void searchUsername(char username[]){
 	if(found == 0){
 		printf("There is no username with that name!\n");
 	}
-	printf("Press ENTER to continue!\n");
+	printf("\nPress ENTER to continue!\n");
 	getchar();
 	return;
 }
