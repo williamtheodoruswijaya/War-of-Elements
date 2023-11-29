@@ -59,6 +59,7 @@ void mainMenu(char username[], int score){
 				getchar();
 				break;
 			case 4:
+				updateScore(); // update score terbaru dari hashTable ke file
 				popAll(); // hapus semua isi dari hashMap biar ga nimpa
 				loop = 0;
 				break;
@@ -463,4 +464,23 @@ void viewScore(){
 	} while(loop == 1);
 	// Ini buat liat score leaderboard
 	return;
+}
+
+void updateScore(){
+	// ini buat update score dengan rewrite ulang file
+	int i;
+	FILE* inputFile = fopen("playerData.txt", "w");
+	if(inputFile == NULL){
+		printf("\033[1;31mWARNING! ERROR IN FILE!\033[0m\ ");
+		printf("\n");
+		exit(1);
+	}
+	for(i = 0; i < TABLE_SIZE; i++){
+		struct userData* curr = head[i];
+		while(curr != NULL){
+			fprintf(inputFile, "%s#%s#%d\n", curr->username, curr->password, curr->score);
+			curr = curr->next;
+		}
+	}
+	fclose(inputFile);
 }
