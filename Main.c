@@ -12,12 +12,15 @@ struct userData{
 	char username[51];
 	char password[21];
 	int score;
+	int character;
 	struct userData* prev;
 	struct userData* next;
 }*head[TABLE_SIZE], *tail[TABLE_SIZE];
 
 struct ClassPlayer{
+	int ID;
 	char name[51];
+	char elements[51];
 	int hp;
 	int mp;
 	int atk;
@@ -48,6 +51,7 @@ void mainMenu(char username[], int score){
 		scanf("%d", &operation);
 		switch(operation){
 			case 1:
+				newMain();
 				getchar();
 				break;
 			case 2:
@@ -134,7 +138,7 @@ void loginMenu(){
 	char username[51];
 	char password[21];
 	char userPassword[21];
-	int valid, score;
+	int valid, score, character;
 	printf("Enter 0 to return to cancel!\n\n");
 	
 	do{
@@ -151,6 +155,7 @@ void loginMenu(){
 		while(curr != NULL){
 			if(strcmp(curr->username, username) == 0){
 				score = curr->score;
+				character = curr->character;
 				strcpy(userPassword, curr->password); 
 				valid = 1;
 				break;
@@ -269,7 +274,7 @@ void signUpMenu(){
 	char operation;
 	scanf(" %c", &operation);
 	if(operation == 'Y'){
-		writeFile(username, password, 0);
+		writeFile(username, password, 0, 0);
 		char messages[] = "\033[1;32mAccount Successfully being made!\nRedirecting back to Main Menu!...\033[0m ";
 		for(i = 0; messages[i] != '\0'; i++){
 			printf("%c", messages[i]);
@@ -293,11 +298,12 @@ void signUpMenu(){
 	return;
 }
 
-void insertData(char username[], char password[], int score){
+void insertData(char username[], char password[], int score, int character){
 	struct userData* node = (struct userData*)malloc(sizeof(struct userData));
 	strcpy(node->username, username);
 	strcpy(node->password, password);
 	node->score = score;
+	node->character = character;
 	node->prev = NULL;
 	node->next = NULL;
 
@@ -328,7 +334,7 @@ void clearScreen(){
     SetConsoleCursorPosition(hConsole, coordScreen);
 }
 
-void writeFile(char username[], char password[], int score){
+void writeFile(char username[], char password[], int score, int character){
 	// storing data into File
 	FILE* inputFile = fopen("playerData.txt", "a");
 	if(inputFile == NULL){
@@ -336,7 +342,7 @@ void writeFile(char username[], char password[], int score){
 		printf("\n");
 		exit(1);
 	}
-	fprintf(inputFile, "%s#%s#%d\n", username, password, score);
+	fprintf(inputFile, "%s#%s#%d#%d\n", username, password, score, character);
 	fclose(inputFile);
 	return;
 } 
@@ -353,10 +359,12 @@ void readFile(){
 	char username[51];
 	char password[21];
 	int score;
-	while(fscanf(outputFile, "%[^#]#%[^#]#%d\n", username, password, &score) == 3){
-		insertData(username, password, score);
+	int character;
+	while(fscanf(outputFile, "%[^#]#%[^#]#%d#%d\n", username, password, &score, &character) == 4){
+		insertData(username, password, score, character);
 	}
 	fclose(outputFile);
+	return;
 }
 
 void popAll(){
@@ -378,6 +386,7 @@ void popAll(){
 			}
 		}
 	}
+	return;
 }
 
 void searchUsername(char username[]){
@@ -399,7 +408,7 @@ void searchUsername(char username[]){
 		printf("There is no username with that name!\n");
 	}
 	printf("\nPress ENTER to continue!\n");
-	getchar();
+	getch();
 	return;
 }
 
@@ -466,6 +475,8 @@ void viewScore(){
 	return;
 }
 
+// Update score terbaru dari hashTable ke file
+// Jadi hashTablenya harus udah di update juga
 void updateScore(){
 	// ini buat update score dengan rewrite ulang file
 	int i;
@@ -478,9 +489,15 @@ void updateScore(){
 	for(i = 0; i < TABLE_SIZE; i++){
 		struct userData* curr = head[i];
 		while(curr != NULL){
-			fprintf(inputFile, "%s#%s#%d\n", curr->username, curr->password, curr->score);
+			fprintf(inputFile, "%s#%s#%d#%d\n", curr->username, curr->password, curr->score, curr->character);
 			curr = curr->next;
 		}
 	}
 	fclose(inputFile);
+}
+
+/* New Main buat fungsi utama game
+Anggep aja int main kosong (~Will) */
+void newMain(){
+	
 }
