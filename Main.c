@@ -100,7 +100,7 @@ int main(){
     	puts("  \\    `  ___   ~~~~~~~~~~~~~~~~~~~~~~~");
     	puts("========================================");
     	puts("\n");
-    	puts("Culling Game\n");
+    	puts("\x1b[36mWar of Elements: Eclipsia Wars\x1b[0m\n");
     	puts("1. Login");
     	puts("2. Sign up");
     	puts("3. Exit");
@@ -118,7 +118,7 @@ int main(){
             	break;
         	case 3:
             	clearScreen();
-            	char thankYou[] = "Thank you for playing!";
+            	char thankYou[] = "\x1b[33mThank you for playing!\x1b[0m";
             	for(i = 0; thankYou[i] != '\0'; i++){
                 	printf("%c", thankYou[i]);
                 	usleep(100000);
