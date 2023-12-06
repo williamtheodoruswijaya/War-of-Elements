@@ -499,5 +499,151 @@ void updateScore(){
 /* New Main buat fungsi utama game
 Anggep aja int main kosong (~Will) */
 void newMain(){
-	
+
+//Function untuk attack
+int performAttack(int attacker_atk, int defender_def) {
+    int damage = attacker_atk - defender_def;
+    if (damage < 0) {
+        damage = 0;
+    }
+    return damage;
+}
+
+//Function untuk giliran player
+void playerTurn(struct ClassPlayer *player, struct ClassEnemy *enemy) {
+    printf("%s's turn!\n", player->name);
+    int choice;
+    printf("Choose your action:\n");
+    printf("1. Attack\n2. Defend\n");
+    scanf("%d", &choice);
+
+    if (choice == 1) { // Attack
+        int mpGain = rand() % 11 + 5;
+        player->mp += mpGain;
+        printf("%s gains %d magic points!\n", player->name, mpGain);
+	//magic attack
+        if (player->mp >= 100) { // Use magic points if >= 100
+            int damage = performAttack(player->atk + 10, enemy->def);
+            printf("%s uses magic attack on %s and deals %d damage!\n", player->name, enemy->name, damage);
+            enemy->hp -= damage;
+            player->mp = 0;
+        } else {
+            // regular attack
+            int damage = performAttack(player->atk, enemy->def);
+            printf("%s attacks %s and deals %d damage!\n", player->name, enemy->name, damage);
+            enemy->hp -= damage;
+        }
+    } else if (choice == 2) { // Defend
+        int mpGain = rand() % 11 + 5;
+        player->mp += mpGain;
+        printf("%s gains %d magic points while defending!\n", player->name, mpGain);
+
+        printf("%s defends!\n", player->name);
+        // Increase player's defense temporarily
+        player->def += 5;
+    }
+}
+
+//Function untuk giliran enemy
+void enemyTurn(struct ClassEnemy *enemy, struct ClassPlayer players[], int numPlayers) {
+    printf("%s's turn!\n", enemy->name);
+
+    // Enemy randomly chooses to attack or defend
+    int choice = rand() % 2;
+
+    if (choice == 0) { // Attack
+        int targetPlayer = rand() % numPlayers;
+        int mpGain = rand() % 11 + 5;
+        enemy->mp += mpGain;
+        printf("%s gains %d magic points!\n", enemy->name, mpGain);
+
+        if (enemy->mp >= 100) { // Use magic points if >= 100
+            // Perform strong attack
+            int damage = performAttack(enemy->atk + 10, players[targetPlayer].def);
+            printf("%s uses magic attack on %s and deals %d damage!\n", enemy->name, players[targetPlayer].name, damage);
+            players[targetPlayer].hp -= damage;
+
+            // Reset enemy's MP
+            enemy->mp = 0;
+        } else {
+            // Perform regular attack
+            int damage = performAttack(enemy->atk, players[targetPlayer].def);
+            printf("%s attacks %s and deals %d damage!\n", enemy->name, players[targetPlayer].name, damage);
+            players[targetPlayer].hp -= damage;
+        }
+    } else if (choice == 1) { // Defend
+        // Increment enemy's MP by a random amount between 5 to 15
+        int mpGain = rand() % 11 + 5;
+        enemy->mp += mpGain;
+        printf("%s defends and gains %d magic points!\n", enemy->name, mpGain);
+
+        printf("%s defends!\n", enemy->name);
+        // Increase enemy's defense temporarily
+        enemy->def += 5;
+    }
+}
+
+int main() {
+    srand(time(0)); // Seed for random number generation
+
+    // Initialize players
+    struct ClassPlayer players[7] = {
+        {1, "Player 1", "Fire", 100, 0, 20, 10},
+        {2, "Player 2", "Water", 120, 0, 18, 12},
+        {3, "Player 3", "Earth", 90, 0, 22, 8},
+        {4, "Player 4", "Fire", 110, 0, 21, 11},
+        {5, "Player 5", "Water", 105, 0, 19, 13},
+        {6, "Player 6", "Earth", 95, 0, 23, 9},
+        {7, "Player 7", "Fire", 115, 0, 20, 10}
+    };
+
+    // Initialize enemy
+    struct ClassEnemy enemy = {1, "Enemy", "Water", 150, 0, 25, 15};
+
+    printf("Welcome to the Turn-Based Battle Game!\n");
+
+    int currentPlayer = 0;
+    int turn = 1;
+    int numPlayers = 7;
+
+    while (numPlayers > 0 && enemy.hp > 0) {
+        printf("\nTurn %d\n", turn);
+
+        // Player's turn
+        if (players[currentPlayer].hp > 0) {
+            playerTurn(&players[currentPlayer], &enemy);
+        }
+
+        // Enemy's turn
+        if (enemy.hp > 0) {
+            enemyTurn(&enemy, players, numPlayers);
+        }
+
+        // Display current health of players and enemy
+        printf("Enemy's Health: %d\n", enemy.hp);
+        printf("Players' Health: ");
+        int activePlayers = 0;
+        for (int i = 0; i < 7; ++i) {
+            if (players[i].hp > 0) {
+                printf("%s: %d | ", players[i].name, players[i].hp);
+                activePlayers++;
+            }
+        }
+        printf("\n");
+
+        // Move to the next player
+        currentPlayer = (currentPlayer + 1) % 7;
+
+        turn++;
+    }
+
+    // Determine the winner
+    if (enemy.hp <= 0) {
+        printf("\nPlayers win!\n");
+    } else {
+        printf("\nEnemy wins!\n");
+    }
+
+    return 0;
+}
 }
