@@ -495,11 +495,6 @@ void updateScore(){
 	}
 	fclose(inputFile);
 }
-
-/* New Main buat fungsi utama game
-Anggep aja int main kosong (~Will) */
-void newMain(){
-
 //Function untuk attack
 int performAttack(int attacker_atk, int defender_def) {
     int damage = attacker_atk - defender_def;
@@ -582,8 +577,8 @@ void enemyTurn(struct ClassEnemy *enemy, struct ClassPlayer players[], int numPl
         enemy->def += 5;
     }
 }
-
-int main() {
+//Function untuk gameplaynya (main nya)
+void gameplay() {
     srand(time(0)); // Seed for random number generation
 
     // Initialize players
@@ -646,4 +641,13 @@ int main() {
 
     return 0;
 }
+
+
+
+/* New Main buat fungsi utama game
+Anggep aja int main kosong (~Will) */
+void newMain(){
+void gameplay();
+
+
 }
