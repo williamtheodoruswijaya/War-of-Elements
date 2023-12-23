@@ -6,6 +6,22 @@
 #include <time.h>
 #include <unistd.h>
 
+void mainMenu(char username[], int score);
+void tutorialMenu();
+void loginMenu();
+void signUpMenu();
+void insertData(char username[], char password[], int score, int character);
+void clearScreen();
+void writeFile(char username[], char password[], int score, int character);
+void readFile();
+void popAll();
+void searchUsername(char username[]);
+void viewScore();
+void updateScore();
+void newMain(char username[], int score);
+void chooseCharacter(char username[], int score);
+void updateCharacter(int ID, char username[], int score);
+
 #define TABLE_SIZE 26 // based on alpabet
 
 struct userData{
@@ -38,7 +54,7 @@ struct ClassEnemy{
 };
 
 void mainMenu(char username[], int score){
-	int loop = 1;
+	int loop = 1, i;
 	while(loop == 1){
 		clearScreen();
 		printf("Welcome, %s...\n\n", username);
@@ -51,7 +67,7 @@ void mainMenu(char username[], int score){
 		scanf("%d", &operation);
 		switch(operation){
 			case 1:
-				newMain();
+				newMain(username, score);
 				getchar();
 				break;
 			case 2:
@@ -65,7 +81,14 @@ void mainMenu(char username[], int score){
 			case 4:
 				updateScore(); // update score terbaru dari hashTable ke file
 				popAll(); // hapus semua isi dari hashMap biar ga nimpa
-				loop = 0;
+				clearScreen();
+            	char messages[] = "\033[1;31mExitting...\033[0m\ ";
+            	for(i = 0; messages[i] != '\0'; i++){
+                	printf("%c", messages[i]);
+                	usleep(100000);
+            	}
+				printf("\n");
+            	loop = 0;
 				break;
 			default:
 				break;
@@ -83,54 +106,6 @@ void tutorialMenu(){
 	}
 	printf("\nPress Enter to continue!\n");
 	getchar();
-}
-
-int main(){
-	int loop = 1, i;
-	while(loop == 1){
-		clearScreen();
-    	puts(" W                  .__. .__.      ");
-    	puts("[ ]                 |::| |::|           ");
-    	puts(" E          ._.     |::| |::|   ._.     ");
-    	puts(" |\\         |:| ._. |::| |::|   |/|     ");
-    	puts("  \\ \\|/     |:|_|/| |::| |::|_  |/|     ");
-    	puts("  |-( )-    |:|\"|/|_|::| |::|\\|_|/| _   ");
-    	puts("  | V L     |:|\"|/|||::| |::|\\|||/||:|  ");
-    	puts("  \\    `  ___   ~~~~~~~~~~~~~~~~~~~~~~~");
-    	puts("  \\    `  ___   ~~~~~~~~~~~~~~~~~~~~~~~");
-    	puts("========================================");
-    	puts("\n");
-    	puts("\x1b[36mWar of Elements: Eclipsia Wars\x1b[0m\n");
-    	puts("1. Login");
-    	puts("2. Sign up");
-    	puts("3. Exit");
-    	printf(">> ");
-    	int operation;
-    	scanf("%d", &operation);
-    	switch(operation){
-        	case 1:
-				loginMenu();
-				getchar();
-            	break;
-        	case 2:
-				signUpMenu();
-				getchar();
-            	break;
-        	case 3:
-            	clearScreen();
-            	char thankYou[] = "\x1b[33mThank you for playing!\x1b[0m";
-            	for(i = 0; thankYou[i] != '\0'; i++){
-                	printf("%c", thankYou[i]);
-                	usleep(100000);
-            	}
-				printf("\n");
-            	loop = 0;
-            	break;
-        	default:
-            	break;
-   		}
-	}
-    return 0;
 }
 
 void loginMenu(){
@@ -496,8 +471,191 @@ void updateScore(){
 	fclose(inputFile);
 }
 
+int main(){
+	int loop = 1, i;
+	while(loop == 1){
+		clearScreen();
+    	puts(" W                  .__. .__.      ");
+    	puts("[ ]                 |::| |::|           ");
+    	puts(" E          ._.     |::| |::|   ._.     ");
+    	puts(" |\\         |:| ._. |::| |::|   |/|     ");
+    	puts("  \\ \\|/     |:|_|/| |::| |::|_  |/|     ");
+    	puts("  |-( )-    |:|\"|/|_|::| |::|\\|_|/| _   ");
+    	puts("  | V L     |:|\"|/|||::| |::|\\|||/||:|  ");
+    	puts("  \\    `  ___   ~~~~~~~~~~~~~~~~~~~~~~~");
+    	puts("  \\    `  ___   ~~~~~~~~~~~~~~~~~~~~~~~");
+    	puts("========================================");
+    	puts("\n");
+    	puts("\x1b[36mWar of Elements: Eclipsia Wars\x1b[0m\n");
+    	puts("1. Login");
+    	puts("2. Sign up");
+    	puts("3. Exit");
+    	printf(">> ");
+    	int operation;
+    	scanf("%d", &operation);
+    	switch(operation){
+        	case 1:
+				loginMenu();
+				getchar();
+            	break;
+        	case 2:
+				signUpMenu();
+				getchar();
+            	break;
+        	case 3:
+            	clearScreen();
+            	char thankYou[] = "\x1b[33mThank you for playing!\x1b[0m";
+            	for(i = 0; thankYou[i] != '\0'; i++){
+                	printf("%c", thankYou[i]);
+                	usleep(100000);
+            	}
+				printf("\n");
+            	loop = 0;
+            	break;
+        	default:
+            	break;
+   		}
+	}
+    return 0;
+}
+
 /* New Main buat fungsi utama game
 Anggep aja int main kosong (~Will) */
-void newMain(){
-	
+void newMain(char username[], int score){
+	int i;
+	if(score == 0){
+		chooseCharacter(username, score);
+	}
+	clearScreen();
+	char messages[] = "Are you ready for the battle? [Y/N]\n";
+	for(i = 0; messages[i] != '\0'; i++){
+		printf("%c", messages[i]);
+		usleep(50000);
+	}
+	printf(">> ");
+	char operation;
+	scanf(" %c", &operation);
+}
+
+void chooseCharacter(char username[], int score){
+	int valid, i, j;
+	int id;
+	do{
+		valid = 1;
+		clearScreen();
+		printf("Choose your character!\n");
+		printf("======================\n");
+		printf("1. Chocobo (Pyshical)\n");
+		printf("2. Shiva (Ice)\n");
+		printf("3. Ramuh (Thunder)\n");
+		printf("4. Ifrit (Fire)\n");
+		printf("5. Leviathan (Water)\n");
+		printf("6. Titan (Earth)\n");
+		printf("7. Bahamut (Dark)\n\n");
+		printf(">> ");
+		int choice;
+		scanf("%d", &choice);
+		switch (choice) {
+            case 1:
+                // Chocobo
+				clearScreen();
+                id = 1;
+                updateCharacter(id, username, score);
+				char messages1[] = "\033[33;1mChocobo is now your main character\033[0m ";
+                for(i = 0; messages1[i] != '\0'; i++){
+					printf("%c", messages1[i]);
+					usleep(50000);
+				}
+				printf("\n");
+                break;
+            case 2:
+                // Shiva
+				clearScreen();
+                id = 2;
+                updateCharacter(id, username, score);
+				char messages2[] = "\033[36;1mShiva is now your main character\033[0m ";
+                for(i = 0; messages2[i] != '\0'; i++){
+					printf("%c", messages2[i]);
+					usleep(50000);
+				}
+				printf("\n");
+                break;
+            case 3:
+                // Ramuh
+				clearScreen();
+                id = 3;
+                updateCharacter(id, username, score);
+				char messages3[] = "\033[35;1mRamuh is now your main character\033[0m ";
+                for(i = 0; messages3[i] != '\0'; i++){
+					printf("%c", messages3[i]);
+					usleep(50000);
+				}
+				printf("\n");
+                break;
+            case 4:
+                // Ifrit
+				clearScreen();
+                id = 4;
+                updateCharacter(id, username, score);
+				char messages4[] = "\033[41;1mIfrit is now your main character\033[0m ";
+				for(i = 0; messages4[i] != '\0'; i++){
+					printf("%c", messages4[i]);
+					usleep(50000);
+				}
+				printf("\n");
+                break;
+            case 5:
+                // Leviathan
+				clearScreen();
+                id = 5;
+                updateCharacter(id, username, score);
+				char messages5[] = "\033[34;1mLeviathan is now your main character\033[0m ";
+				for(i = 0; messages5[i] != '\0'; i++){
+					printf("%c", messages5[i]);
+					usleep(50000);
+				}
+				printf("\n");
+                break;
+            case 6:
+                // Titan
+				clearScreen();
+                id = 6;
+                updateCharacter(id, username, score);
+				char messages6[] = "\033[32;1mTitan is now your main character\033[0m ";
+				for(i = 0; messages6[i] != '\0'; i++){
+					printf("%c", messages6[i]);
+					usleep(50000);
+				}
+				printf("\n");
+                break;
+            case 7:
+                // Bahamut
+				clearScreen();
+                id = 7;
+                updateCharacter(id, username, score);
+				char messages7[] = "\033[30;47;1mBahamut is now your main character\033[0m ";
+				for(i = 0; messages7[i] != '\0'; i++){
+					printf("%c", messages7[i]);
+					usleep(50000);
+				}
+				printf("\n");
+                break;
+            default:
+                valid = 0;
+                break;
+        }
+	}while(valid == 0);
+}
+
+void updateCharacter(int ID, char username[], int score){
+	int index = username[0] - 'a';
+	struct userData* curr = head[index];
+	while(curr != NULL){
+		if(strcmp(username, curr->username) == 0){
+			curr->character = ID;
+			curr->score = score;
+			break;
+		}
+		curr = curr->next;
+	}
 }
