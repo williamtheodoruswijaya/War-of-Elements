@@ -37,20 +37,20 @@ struct ClassEnemy{
 };
 
 void clearScreen();
-void newMain(char username[], int score);
+void newMain(char username[], int score, int id);
 void tutorialMenu();
 void viewScore();
-void updateScore();
+void updateScore(int score, char username[]);
 void popAll();
 void readFile();
 void writeFile(char username[], char password[], int score, int character);
 struct ClassPlayer* createPlayer(int id, char name[], char elements[], int hp, int mp, int atk, int def);
 struct ClassEnemy* createEnemy(int id, char name[], char elements[], int hp, int mp, int atk, int def);
 void chooseCharacter(char username[], int score);
-void startGame(char username[], int score, struct ClassPlayer* player);
+void startGame(char username[], int score, struct ClassPlayer* player, int id);
 void updateCharacter(int ID, char username[], int score);
 
-void mainMenu(char username[], int score){
+void mainMenu(char username[], int score, int id){
 	int loop = 1, i;
 	while(loop == 1){
 		clearScreen();
@@ -64,7 +64,7 @@ void mainMenu(char username[], int score){
 		scanf("%d", &operation);
 		switch(operation){
 			case 1:
-				newMain(username, score);
+				newMain(username, score, id);
 				getchar();
 				break;
 			case 2:
@@ -76,7 +76,7 @@ void mainMenu(char username[], int score){
 				getchar();
 				break;
 			case 4:
-				updateScore(); // update score terbaru dari hashTable ke file
+				updateScore(score, username); // update score terbaru dari hashTable ke file
 				popAll(); // hapus semua isi dari hashMap biar ga nimpa
 				clearScreen();
             	char messages[] = "\033[1;31mExitting...\033[0m\ ";
@@ -156,7 +156,7 @@ void loginMenu(){
 			valid = 1;
 		}
 	}while(valid == 0);
-	mainMenu(username, score);
+	mainMenu(username, score, character);
 }
 
 void signUpMenu(){
@@ -495,7 +495,7 @@ void viewScore(){
 
 // Update score terbaru dari hashTable ke file
 // Jadi hashTablenya harus udah di update juga
-void updateScore(){
+void updateScore(int score, char username[]){
 	// ini buat update score dengan rewrite ulang file
 	int i;
 	FILE* inputFile = fopen("playerData.txt", "w");
@@ -506,46 +506,75 @@ void updateScore(){
 	}
 	for(i = 0; i < TABLE_SIZE; i++){
 		struct userData* curr = head[i];
-		while(curr != NULL){
-			fprintf(inputFile, "%s#%s#%d#%d\n", curr->username, curr->password, curr->score, curr->character);
-			curr = curr->next;
+		if(head[i] != NULL){
+			while(curr != NULL){
+				if(strcmp(curr->username, username) == 0){
+					curr->score = score;
+				}
+				fprintf(inputFile, "%s#%s#%d#%d\n", curr->username, curr->password, curr->score, curr->character);
+				curr = curr->next;
+			}
 		}
 	}
 	fclose(inputFile);
 }
 
+int playerHealth(){
+	int hp = 120;
+	return hp;
+}
+
+int playerMagic(){
+	int mp = 40;
+	return mp;
+}
+
+int playerAttack(){
+	int atk = 30;
+	return atk;
+}
+
+int playerDefense(){
+	int def = 30;
+	return def;
+}
+
 /* New Main buat fungsi utama game
 Anggep aja int main kosong (~Will) */
-void newMain(char username[], int score){
+void newMain(char username[], int score, int id){
 	int i;
 	struct ClassPlayer* player;
 	if(score == 0){
 		chooseCharacter(username, score);
 	}
+	int hp = playerHealth();
+	int mp = playerMagic();
+	int atk = playerAttack();
+	int def = playerDefense();
 	int index = username[0] - 'a';
 	struct userData* curr = head[index];
 	while(curr != NULL){
 		if(strcmp(username, curr->username) == 0){
 			if(curr->character == 1){
-				player = createPlayer(1, "\033[33;1mChocobo\033[0m ", "pyshical", 500, 30, 70, 40);
+				player = createPlayer(1, "\033[33;1mChocobo\033[0m ", "pyshical", hp, mp, atk, def);
 			}
 			else if(curr->character == 2){
-				player = createPlayer(2, "\033[36;1mShiva\033[0m ", "ice", 300, 80, 50, 30	);
+				player = createPlayer(2, "\033[36;1mShiva\033[0m ", "ice", hp, mp, atk, def);
 			}
 			else if(curr->character == 3){
-				player = createPlayer(3, "\033[35;1mRamuh\033[0m ", "thunder", 400, 60, 60, 50);
+				player = createPlayer(3, "\033[35;1mRamuh\033[0m ", "thunder", hp, mp, atk, def);
 			}
 			else if(curr->character == 4){
-				player = createPlayer(4, "\033[41;1mIfrit\033[0m ", "fire", 350, 70, 80, 40);
+				player = createPlayer(4, "\033[41;1mIfrit\033[0m ", "fire", hp, mp, atk, def);
 			}
 			else if(curr->character == 5){
-				player = createPlayer(5, "\033[34;1mLeviathan\033[0m ", "water", 450, 50, 60, 60);
+				player = createPlayer(5, "\033[34;1mLeviathan\033[0m ", "water", hp, mp, atk, def);
 			}
 			else if(curr->character == 6){
-				player = createPlayer(6, "\033[32;1mTitan\033[0m ", "earth", 400, 40, 90, 50);
+				player = createPlayer(6, "\033[32;1mTitan\033[0m ", "earth", hp, mp, atk, def);
 			}
 			else if(curr->character == 7){
-				player = createPlayer(7, "\033[30;47;1mBahamut\033[0m ", "dark", 500, 50, 100, 50);
+				player = createPlayer(7, "\033[30;47;1mBahamut\033[0m ", "dark", hp, mp, atk, def);
 			}
 			break;
 		}
@@ -561,7 +590,7 @@ void newMain(char username[], int score){
 	char operation;
 	scanf(" %c", &operation);
 	if(operation == 'Y'){
-		startGame(username, score, player);
+		startGame(username, score, player, id);
 	}
 	else if(operation == 'N'){
 		char messages[] = "Redirecting back to Main Menu!...\n";
@@ -702,6 +731,10 @@ void updateCharacter(int ID, char username[], int score){
 	}
 }
 
+void updateNewScore(int score, char username[]){
+	updateScore(score, username);
+}
+
 struct ClassPlayer* createPlayer(int id, char name[], char elements[], int hp, int mp, int atk, int def){
 	struct ClassPlayer* player = (struct ClassPlayer*)malloc(sizeof(struct ClassPlayer));
 	player->ID = id;
@@ -720,7 +753,7 @@ struct ClassEnemy* createEnemy(int id, char name[], char elements[], int hp, int
 	strcpy(enemy->name, name);
 	strcpy(enemy->elements, elements);
 	enemy->hp = hp;
-	enemy->mp = mp;
+	enemy->mp = mp * 0.5;
 	enemy->atk = atk;
 	enemy->def = def;
 	return enemy;
@@ -756,38 +789,163 @@ char* aliasEnemy(const char name[]){
 }
 
 void attack(struct ClassPlayer* player, struct ClassEnemy* enemy){
-	int damage = player->atk - (enemy->def * 0.3);
+	srand(time(NULL));
+	int maxAtk = player->atk;
+	int minAtk = player->atk * 0.5;
+	int damage = (minAtk + rand() % (maxAtk - minAtk + 1)) - (enemy->def * 0.3);
 	if(damage < 0){
 		damage = 0;
 	}
 	enemy->hp -= damage;
-	printf("%s attacked %s with %d damage!\n", player->name, enemy->name, damage);
+	enemy->def -= (damage * 0.5);
+	if(enemy->def < 0){
+		enemy->def = 0;
+	}
+	char playerName[101];
+	strcpy(playerName, player->name);
+
+	char enemyName[101];
+	strcpy(enemyName, enemy->name);
+
+	char damageString[4];
+	sprintf(damageString, "%d", damage);
+	for(int i = 0; playerName[i] != '\0'; i++){
+		printf("%c", playerName[i]);
+		usleep(25000);
+	}
+	char messages1[] = " attacked ";
+	for(int i = 0; messages1[i] != '\0'; i++){
+		printf("%c", messages1[i]);
+		usleep(25000);
+	}
+	for(int i = 0; enemyName[i] != '\0'; i++){
+		printf("%c", enemyName[i]);
+		usleep(25000);
+	}
+	char messages2[] = " with ";
+	for(int i = 0; messages2[i] != '\0'; i++){
+		printf("%c", messages2[i]);
+		usleep(25000);
+	}
+	for(int i = 0; damageString[i] != '\0'; i++){
+		printf("%c", damageString[i]);
+		usleep(25000);
+	}
+	char messages3[] = " damage!\n";
+	for(int i = 0; messages3[i] != '\0'; i++){
+		printf("%c", messages3[i]);
+		usleep(25000);
+	}
 	printf("\n");
 }
 
-void defense(struct ClassPlayer* player){
-	player->def += 50;
-	printf("%s defense increased by 50!\n", player->name);
+void defense(struct ClassPlayer* player, int maxDEF){
+	srand(time(NULL));
+	int increase = 5 + rand() % (10 - 5 + 1);
+	player->def += increase;
+	if(player->def > maxDEF){
+		player->def = maxDEF;
+	}
+	char playerName[101];
+	strcpy(playerName, player->name);
+	char messages[] = " defense increased by ";
+	for(int i = 0; playerName[i] != '\0'; i++){
+		printf("%c", playerName[i]);
+		usleep(25000);
+	}
+	for(int i = 0; messages[i] != '\0'; i++){
+		printf("%c", messages[i]);
+		usleep(25000);
+	}
+	char increaseString[4];
+	sprintf(increaseString, "%d", increase);
+	for(int i = 0; increaseString[i] != '\0'; i++){
+		printf("%c", increaseString[i]);
+		usleep(25000);
+	}
 	printf("\n");
 }
 
-void heal(struct ClassPlayer* player){
-	player->hp += 100;
-	printf("%s healed by 100!\n", player->name);
+void heal(struct ClassPlayer* player, int maxHP){
+	srand(time(NULL));
+	int increase = 30 + rand() % (40 - 30 + 1);
+	player->hp += increase;
+	if(player->hp > maxHP){
+		player->hp = maxHP;
+	}
+	char playerName[101];
+	strcpy(playerName, player->name);
+	char messages[] = " healed by ";
+	for(int i = 0; playerName[i] != '\0'; i++){
+		printf("%c", playerName[i]);
+		usleep(25000);
+	}
+	for(int i = 0; messages[i] != '\0'; i++){
+		printf("%c", messages[i]);
+		usleep(25000);
+	}
+	char increaseString[4];
+	sprintf(increaseString, "%d", increase);
+	for(int i = 0; increaseString[i] != '\0'; i++){
+		printf("%c", increaseString[i]);
+		usleep(25000);
+	}
 	printf("\n");
 }
 
-void specialAttack(struct ClassPlayer* player, struct ClassEnemy* enemy){
-	int damage = player->atk - (enemy->def * 0.3) + player->mp;
+void specialAttack(struct ClassPlayer* player, struct ClassEnemy* enemy, int maxHP){
+	srand(time(NULL));
+	int maxAtk = player->atk;
+	int minAtk = player->atk * 0.5;
+	int damage = (minAtk + rand() % (maxAtk - minAtk + 1)) - (enemy->def * 0.3) + (player->mp * 0.5);
 	if(damage < 0){
 		damage = 0;
 	}
+	if(player->hp < maxHP){
+		damage = 0;
+		printf("\033[1;31mYou can't use this skill!\033[0m\ ");
+		printf("\n");
+	}
 	enemy->hp -= damage;
-	printf("%s attacked %s with %d damage!\n", player->name, enemy->name, damage);
+	char playerName[101];
+	strcpy(playerName, player->name);
+
+	char enemyName[101];
+	strcpy(enemyName, enemy->name);
+
+	char damageString[4];
+	sprintf(damageString, "%d", damage);
+	for(int i = 0; playerName[i] != '\0'; i++){
+		printf("%c", playerName[i]);
+		usleep(25000);
+	}
+	char messages1[] = " attacked ";
+	for(int i = 0; messages1[i] != '\0'; i++){
+		printf("%c", messages1[i]);
+		usleep(25000);
+	}
+	for(int i = 0; enemyName[i] != '\0'; i++){
+		printf("%c", enemyName[i]);
+		usleep(25000);
+	}
+	char messages2[] = " with ";
+	for(int i = 0; messages2[i] != '\0'; i++){
+		printf("%c", messages2[i]);
+		usleep(25000);
+	}
+	for(int i = 0; damageString[i] != '\0'; i++){
+		printf("%c", damageString[i]);
+		usleep(25000);
+	}
+	char messages3[] = " Ult!\n";
+	for(int i = 0; messages3[i] != '\0'; i++){
+		printf("%c", messages3[i]);
+		usleep(25000);
+	}
 	printf("\n");
 }
 
-void battle(struct ClassPlayer* player, struct ClassEnemy* enemy, int* score){
+void battle(struct ClassPlayer* player, struct ClassEnemy* enemy, int score, int bossMaxHP, int bosMaxDef, char username[], int ID){
 	int loop = 1, i, win = 0;
 	int playerTurn, enemyTurn;
 	char *alias = aliasEnemy(enemy->name);
@@ -829,21 +987,20 @@ void battle(struct ClassPlayer* player, struct ClassEnemy* enemy, int* score){
 				attack(player, enemy);
 				break;
 			case 2:
-				defense(player);
+				defense(player, 30);
 				break;
 			case 3:
-				heal(player);
+				heal(player, 120);
 				break;
 			case 4:
-				specialAttack(player, enemy);
+				specialAttack(player, enemy, 120);
 				break;
 			default:
 				printf("\033[1;31mError! Invalid input!\033[0m ");
 				printf("\n");
 				continue;
 		}
-		getchar();
-		printf("\nBoss's turn!\n");
+		printf("Boss's turn!\n");
 		srand(time(NULL));
 		enemyTurn = 1 + rand() % (4 - 1 + 1);
 		switch(enemyTurn){
@@ -851,17 +1008,19 @@ void battle(struct ClassPlayer* player, struct ClassEnemy* enemy, int* score){
 				attack(enemy, player);
 				break;
 			case 2:
-				defense(enemy);
+				defense(enemy, bosMaxDef);
 				break;
 			case 3:
-				heal(enemy);
+				heal(enemy, bossMaxHP);
 				break;
 			case 4:
-				specialAttack(enemy, player);
+				specialAttack(enemy, player, bossMaxHP);
 				break;
 			default:
 				break;
 		}
+		printf("Press ENTER to continue!\n");
+		getchar();
 		getchar();
 	}
 	if(win == 1){
@@ -877,12 +1036,35 @@ void battle(struct ClassPlayer* player, struct ClassEnemy* enemy, int* score){
 		printf("DEF: %d\n", player->def);
 		printf("\n");
 		printf("Press ENTER to continue!\n");
-		score += 100;
-		getchar();
+		updateCharacter(ID, username, score);
 	}
 }
 
-void startGame(char username[], int score, struct ClassPlayer* player){
+int bossHP(){
+	srand(time(NULL));
+	int hp = 200 + rand() % (400 - 200 + 1);
+	return hp;
+}
+
+int bossMP(){
+	srand(time(NULL));
+	int mp = 15 + rand() % (20 - 15 + 1);
+	return mp;
+}
+
+int bossAttack(){
+	srand(time(NULL));
+	int atk = 40 + rand() % (50 - 40 + 1);
+	return atk;
+}
+
+int bossDefense(){
+	srand(time(NULL));
+	int def = 10 + rand() % (15 - 10 + 1);
+	return def;
+}
+
+void startGame(char username[], int score, struct ClassPlayer* player, int ID){
 	clearScreen();
 	struct ClassEnemy* enemy;
 	char messages[] = "Commencing battle unit!...\n";
@@ -890,6 +1072,10 @@ void startGame(char username[], int score, struct ClassPlayer* player){
 		printf("%c", messages[i]);
 		usleep(100000);
 	}
+	int HP = bossHP();
+    int MP = bossMP();
+    int ATK = bossAttack();
+    int DEF = bossDefense();
 	srand(time(NULL));
 	int randomNum = 1 + rand() % (7 - 1 + 1);
 	if(randomNum == 1){
@@ -898,7 +1084,7 @@ void startGame(char username[], int score, struct ClassPlayer* player){
 			printf("%c", messages1[i]);
 			usleep(50000);
 		}
-		enemy = createEnemy(1, "\033[33;1mGro-goroth\033[0m ", "pyshical", 2000, 100, 400, 200);
+		enemy = createEnemy(1, "\033[33;1mGro-goroth\033[0m ", "pyshical", HP, MP, ATK, DEF);
 	}
 	else if(randomNum == 2){
 		char messages2[] = "\033[36;1mYou are facing Sylvian\033[0m ";
@@ -906,7 +1092,7 @@ void startGame(char username[], int score, struct ClassPlayer* player){
 			printf("%c", messages2[i]);
 			usleep(50000);
 		}
-		enemy = createEnemy(2, "\033[32;1mSylvian\033[0m ", "ice", 1500, 200, 300, 100);
+		enemy = createEnemy(2, "\033[32;1mSylvian\033[0m ", "ice", HP, MP, ATK, DEF);
 	}
 	else if(randomNum == 3){
 		char messages3[] = "\033[35;1mYou are facing Zeromus\033[0m ";
@@ -914,7 +1100,7 @@ void startGame(char username[], int score, struct ClassPlayer* player){
 			printf("%c", messages3[i]);
 			usleep(50000);
 		}
-		enemy = createEnemy(3, "\033[35;1mZeromus\033[0m ", "thunder", 1800, 150, 350, 150);
+		enemy = createEnemy(3, "\033[35;1mZeromus\033[0m ", "thunder", HP, MP, ATK, DEF);
 	}
 	else if(randomNum == 4){
 		char messages4[] = "\033[41;1mYou are facing Rher\033[0m ";
@@ -922,7 +1108,7 @@ void startGame(char username[], int score, struct ClassPlayer* player){
 			printf("%c", messages4[i]);
 			usleep(50000);
 		}
-		enemy = createEnemy(4, "\033[37;1mRher\033[0m ", "fire", 1600, 100, 400, 100);
+		enemy = createEnemy(4, "\033[37;1mRher\033[0m ", "fire", HP, MP, ATK, DEF);
 	}
 	else if(randomNum == 5){
 		char messages5[] = "\033[34;1mYou are facing Vinushka\033[0m ";
@@ -930,7 +1116,7 @@ void startGame(char username[], int score, struct ClassPlayer* player){
 			printf("%c", messages5[i]);
 			usleep(50000);
 		}
-		enemy = createEnemy(5, "\033[36;1mVinushka\033[0m ", "water", 1700, 150, 300, 150);
+		enemy = createEnemy(5, "\033[36;1mVinushka\033[0m ", "water", HP, MP, ATK, DEF);
 	}
 	else if(randomNum == 6){
 		char messages6[] = "\033[32;1mYou are facing Golem\033[0m ";
@@ -938,7 +1124,7 @@ void startGame(char username[], int score, struct ClassPlayer* player){
 			printf("%c", messages6[i]);
 			usleep(50000);
 		}
-		enemy = createEnemy(6, "\033[32;43;1mGolem\033[0m ", "earth", 2000, 100, 450, 200);
+		enemy = createEnemy(6, "\033[32;43;1mGolem\033[0m ", "earth", HP, MP, ATK, DEF);
 	}
 	else if(randomNum == 7){
 		char messages7[] = "\033[30;47;1mYou are facing All-mer\033[0m ";
@@ -946,9 +1132,9 @@ void startGame(char username[], int score, struct ClassPlayer* player){
 			printf("%c", messages7[i]);
 			usleep(50000);
 		}
-		enemy = createEnemy(7, "\033[37;1mAll-mer\033[0m ", "dark", 2500, 200, 500, 250);
+		enemy = createEnemy(7, "\033[37;1mAll-mer\033[0m ", "dark", HP, MP, ATK, DEF);
 	}
-	battle(player, enemy, score);
+	battle(player, enemy, score, HP, DEF, username, ID);
 }
 
 int main(){
