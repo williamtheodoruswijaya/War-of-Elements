@@ -6,27 +6,7 @@
 #include <time.h>
 #include <unistd.h>
 
-void mainMenu(char username[], int score);
-void tutorialMenu();
-void loginMenu();
-void signUpMenu();
-void insertData(char username[], char password[], int score, int character);
-void clearScreen();
-void writeFile(char username[], char password[], int score, int character);
-void readFile();
-void popAll();
-void searchUsername(char username[]);
-void merge(struct userData* arr[], int left, int mid, int right);
-void mergeSort(struct userData* arr[], int left, int right);
-void viewScore();
-void updateScore();
-void newMain(char username[], int score);
-void chooseCharacter(char username[], int score);
-void updateCharacter(int ID, char username[], int score);
-void startGame(char username[], int score);
-
 #define TABLE_SIZE 26 // based on alpabet
-
 struct userData{
 	char username[51];
 	char password[21];
@@ -681,8 +661,13 @@ void updateCharacter(int ID, char username[], int score){
 void startGame(char username[], int score){
 	clearScreen();
 	char messages[] = "Commencing battle unit!...\n";
+	for(int i = 0; messages[i] != '\0'; i++){
+		printf("%c", messages[i]);
+		usleep(50000);
+	}
 	srand(time(NULL));
 	int randomNum = 1 + rand() % (7 - 1 + 1);
+	
 }
 
 int main(){
