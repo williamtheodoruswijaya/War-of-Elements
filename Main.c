@@ -36,6 +36,9 @@ struct ClassEnemy{
 	int def;
 };
 
+struct ClassPlayer* createPlayer(int id, char name[], char elements[], int hp, int mp, int atk, int def);
+struct ClassEnemy* createEnemy(int id, char name[], char elements[], int hp, int mp, int atk, int def);
+
 void mainMenu(char username[], int score){
 	int loop = 1, i;
 	while(loop == 1){
@@ -504,8 +507,38 @@ void updateScore(){
 Anggep aja int main kosong (~Will) */
 void newMain(char username[], int score){
 	int i;
+	struct ClassPlayer* player;
 	if(score == 0){
 		chooseCharacter(username, score);
+	}
+	int index = username[0] - 'a';
+	struct userData* curr = head[index];
+	while(curr != NULL){
+		if(strcmp(username, curr->username) == 0){
+			if(curr->character == 1){
+				player = createPlayer(1, "Chocobo", "pyshical", 500, 30, 70, 40);
+			}
+			else if(curr->character == 2){
+				player = createPlayer(2, "Shiva", "ice", 300, 80, 50, 30	);
+			}
+			else if(curr->character == 3){
+				player = createPlayer(3, "Ramuh", "thunder", 400, 60, 60, 50);
+			}
+			else if(curr->character == 4){
+				player = createPlayer(4, "Ifrit", "fire", 350, 70, 80, 40);
+			}
+			else if(curr->character == 5){
+				player = createPlayer(5, "Leviathan", "water", 450, 50, 60, 60);
+			}
+			else if(curr->character == 6){
+				player = createPlayer(6, "Titan", "earth", 400, 40, 90, 50);
+			}
+			else if(curr->character == 7){
+				player = createPlayer(7, "Bahamut", "dark", 500, 50, 100, 50);
+			}
+			break;
+		}
+		curr = curr->next;
 	}
 	clearScreen();
 	char messages[] = "Are you ready for the battle? [Y/N]\n";
@@ -517,7 +550,7 @@ void newMain(char username[], int score){
 	char operation;
 	scanf(" %c", &operation);
 	if(operation == 'Y'){
-		startGame(username, score);
+		startGame(username, score, player);
 	}
 	else if(operation == 'N'){
 		char messages[] = "Redirecting back to Main Menu!...\n";
@@ -658,16 +691,133 @@ void updateCharacter(int ID, char username[], int score){
 	}
 }
 
-void startGame(char username[], int score){
+struct ClassPlayer* createPlayer(int id, char name[], char elements[], int hp, int mp, int atk, int def){
+	struct ClassPlayer* player = (struct ClassPlayer*)malloc(sizeof(struct ClassPlayer));
+	player->ID = id;
+	strcpy(player->name, name);
+	strcpy(player->elements, elements);
+	player->hp = hp;
+	player->mp = mp;
+	player->atk = atk;
+	player->def = def;
+	return player;
+}
+
+struct ClassEnemy* createEnemy(int id, char name[], char elements[], int hp, int mp, int atk, int def){
+	struct ClassEnemy* enemy = (struct ClassEnemy*)malloc(sizeof(struct ClassEnemy));
+	enemy->ID = id;
+	strcpy(enemy->name, name);
+	strcpy(enemy->elements, elements);
+	enemy->hp = hp;
+	enemy->mp = mp;
+	enemy->atk = atk;
+	enemy->def = def;
+	return enemy;
+}
+
+void battle(struct ClassPlayer* player, struct ClassEnemy* enemy){
 	clearScreen();
+	int loop = 1, i;
+	char alias[51];
+	// Generate the alias for the enemies
+	if(strcmp(enemy->name, "Gro-goroth") == 0){
+		strcpy(alias, "\033[37;41;1mGod of Destruction\033[0m ");
+	}
+	else if(strcmp(enemy->name, "Sylvian") == 0){
+		strcpy(alias, "\033[37;42;1mThe goddess of love and fertility\033[0m ");
+	}
+	else if(strcmp(enemy->name, "Zeromus") == 0){
+		strcpy(alias, "\033[37;40;1mGod of Depth\033[0m ");
+	}
+	else if(strcmp(enemy->name, "Rher") == 0){
+		strcpy(alias, "\033[37;43;1mThe trickster moon god\033[0m ");
+	}
+	else if(strcmp(enemy->name, "Vinushka") == 0){
+		strcpy(alias, "\033[37;46;1mGod of Nature\033[0m ");
+	}
+	else if(strcmp(enemy->name, "Golem") == 0){
+		strcpy(alias, "\033[37;45;1mThe Forgotten One\033[0m ");
+	}
+	else if(strcmp(enemy->name, "All-mer") == 0){
+		strcpy(alias, "\033[30;47;1mThe Ascended One\033[0m ");
+	}
+
+	while(loop == 1){
+		printf("%s, %s, [HEALTH: %d] [DEF: %d]\n", enemy->name, alias, enemy->hp, enemy->def);
+		printf("\n");
+		printf("%s, %s, [HEALTH: %d] [DEF: %d]\n", player->name, player->elements, player->hp, player->def);
+		printf("\n");
+		
+	}
+}
+
+void startGame(char username[], int score, struct ClassPlayer* player){
+	clearScreen();
+	struct ClassEnemy* enemy;
 	char messages[] = "Commencing battle unit!...\n";
 	for(int i = 0; messages[i] != '\0'; i++){
 		printf("%c", messages[i]);
-		usleep(50000);
+		usleep(100000);
 	}
 	srand(time(NULL));
 	int randomNum = 1 + rand() % (7 - 1 + 1);
-	
+	if(randomNum == 1){
+		char messages1[] = "\033[33;1mYou are facing Gro-goroth\033[0m ";
+		for(int i = 0; messages1[i] != '\0'; i++){
+			printf("%c", messages1[i]);
+			usleep(50000);
+		}
+		enemy = createEnemy(1, "Gro-goroth", "pyshical", 2000, 100, 400, 200);
+	}
+	else if(randomNum == 2){
+		char messages2[] = "\033[36;1mYou are facing Sylvian\033[0m ";
+		for(int i = 0; messages2[i] != '\0'; i++){
+			printf("%c", messages2[i]);
+			usleep(50000);
+		}
+		enemy = createEnemy(2, "Sylvian", "ice", 1500, 200, 300, 100);
+	}
+	else if(randomNum == 3){
+		char messages3[] = "\033[35;1mYou are facing Zeromus\033[0m ";
+		for(int i = 0; messages3[i] != '\0'; i++){
+			printf("%c", messages3[i]);
+			usleep(50000);
+		}
+		enemy = createEnemy(3, "Zeromus", "thunder", 1800, 150, 350, 150);
+	}
+	else if(randomNum == 4){
+		char messages4[] = "\033[41;1mYou are facing Rher\033[0m ";
+		for(int i = 0; messages4[i] != '\0'; i++){
+			printf("%c", messages4[i]);
+			usleep(50000);
+		}
+		enemy = createEnemy(4, "Rher", "fire", 1600, 100, 400, 100);
+	}
+	else if(randomNum == 5){
+		char messages5[] = "\033[34;1mYou are facing Vinushka\033[0m ";
+		for(int i = 0; messages5[i] != '\0'; i++){
+			printf("%c", messages5[i]);
+			usleep(50000);
+		}
+		enemy = createEnemy(5, "Vinushka", "water", 1700, 150, 300, 150);
+	}
+	else if(randomNum == 6){
+		char messages6[] = "\033[32;1mYou are facing Golem\033[0m ";
+		for(int i = 0; messages6[i] != '\0'; i++){
+			printf("%c", messages6[i]);
+			usleep(50000);
+		}
+		enemy = createEnemy(6, "Golem", "earth", 2000, 100, 450, 200);
+	}
+	else if(randomNum == 7){
+		char messages7[] = "\033[30;47;1mYou are facing All-mer\033[0m ";
+		for(int i = 0; messages7[i] != '\0'; i++){
+			printf("%c", messages7[i]);
+			usleep(50000);
+		}
+		enemy = createEnemy(7, "All-mer", "dark", 2500, 200, 500, 250);
+	}
+	battle(player, enemy);
 }
 
 int main(){
