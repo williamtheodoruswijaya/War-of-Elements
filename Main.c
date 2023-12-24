@@ -16,11 +16,14 @@ void writeFile(char username[], char password[], int score, int character);
 void readFile();
 void popAll();
 void searchUsername(char username[]);
+void merge(struct userData* arr[], int left, int mid, int right);
+void mergeSort(struct userData* arr[], int left, int right);
 void viewScore();
 void updateScore();
 void newMain(char username[], int score);
 void chooseCharacter(char username[], int score);
 void updateCharacter(int ID, char username[], int score);
+void startGame(char username[], int score);
 
 #define TABLE_SIZE 26 // based on alpabet
 
@@ -387,6 +390,60 @@ void searchUsername(char username[]){
 	return;
 }
 
+void merge(struct userData* arr[], int left, int mid, int right){
+	int i, j, k;
+	int n1 = mid - left + 1;
+	int n2 = right - mid;
+
+	struct userData *L[n1], *R[n2];
+
+	for(i = 0; i < n1; i++){
+		L[i] = arr[left + i];
+	}
+	for(j = 0; j < n2; j++){
+		R[j] = arr[mid + 1 + j];
+	}
+
+	i = 0;
+	j = 0;
+	k = left;
+
+	while(i < n1 && j < n2){
+		if(L[i]->score >= R[j]->score){
+			arr[k] = L[i];
+			i++;
+		}
+		else{
+			arr[k] = R[j];
+			j++;
+		}
+		k++;
+	}
+
+	while(i < n1){
+		arr[k] = L[i];
+		i++;
+		k++;
+	}
+
+	while(j < n2){
+		arr[k] = R[j];
+		j++;
+		k++;
+	}
+}
+
+void mergeSort(struct userData* arr[], int left, int right){
+	if(left < right){
+		int mid = left + (right - left) / 2;
+
+		mergeSort(arr, left, mid);
+		mergeSort(arr, mid + 1, right);
+
+		merge(arr, left, mid, right);
+	}
+}
+
 void viewScore(){
 	int i = 0, j = 0;
 	clearScreen();
@@ -414,15 +471,7 @@ void viewScore(){
 		}
 	} // Ini buat mindahin semua hash table ke dalam satu array
 
-	for(i = 0; i < Arraysize; i++){
-		for(j = 0; j < Arraysize-1-i; j++){
-			if(arr[j]->score < arr[j+1]->score){
-				struct userData* temp = arr[j];
-				arr[j] = arr[j+1];
-				arr[j+1] = temp;
-			}
-		}
-	} // Ini BubbleSort buat sorting array berdasarkan score
+	mergeSort(arr, 0, Arraysize - 1); // Ini buat sort array berdasarkan score
 
 	int loop = 1;
 	do{
@@ -471,54 +520,6 @@ void updateScore(){
 	fclose(inputFile);
 }
 
-int main(){
-	int loop = 1, i;
-	while(loop == 1){
-		clearScreen();
-    	puts(" W                  .__. .__.      ");
-    	puts("[ ]                 |::| |::|           ");
-    	puts(" E          ._.     |::| |::|   ._.     ");
-    	puts(" |\\         |:| ._. |::| |::|   |/|     ");
-    	puts("  \\ \\|/     |:|_|/| |::| |::|_  |/|     ");
-    	puts("  |-( )-    |:|\"|/|_|::| |::|\\|_|/| _   ");
-    	puts("  | V L     |:|\"|/|||::| |::|\\|||/||:|  ");
-    	puts("  \\    `  ___   ~~~~~~~~~~~~~~~~~~~~~~~");
-    	puts("  \\    `  ___   ~~~~~~~~~~~~~~~~~~~~~~~");
-    	puts("========================================");
-    	puts("\n");
-    	puts("\x1b[36mWar of Elements: Eclipsia Wars\x1b[0m\n");
-    	puts("1. Login");
-    	puts("2. Sign up");
-    	puts("3. Exit");
-    	printf(">> ");
-    	int operation;
-    	scanf("%d", &operation);
-    	switch(operation){
-        	case 1:
-				loginMenu();
-				getchar();
-            	break;
-        	case 2:
-				signUpMenu();
-				getchar();
-            	break;
-        	case 3:
-            	clearScreen();
-            	char thankYou[] = "\x1b[33mThank you for playing!\x1b[0m";
-            	for(i = 0; thankYou[i] != '\0'; i++){
-                	printf("%c", thankYou[i]);
-                	usleep(100000);
-            	}
-				printf("\n");
-            	loop = 0;
-            	break;
-        	default:
-            	break;
-   		}
-	}
-    return 0;
-}
-
 /* New Main buat fungsi utama game
 Anggep aja int main kosong (~Will) */
 void newMain(char username[], int score){
@@ -535,6 +536,23 @@ void newMain(char username[], int score){
 	printf(">> ");
 	char operation;
 	scanf(" %c", &operation);
+	if(operation == 'Y'){
+		startGame(username, score);
+	}
+	else if(operation == 'N'){
+		char messages[] = "Redirecting back to Main Menu!...\n";
+		for(i = 0; messages[i] != '\0'; i++){
+			printf("%c", messages[i]);
+			usleep(50000);
+		}
+	}
+	else{
+		char messages[] = "Error! Operation Canceled!...\n";
+		for(i = 0; messages[i] != '\0'; i++){
+			printf("%c", messages[i]);
+			usleep(50000);
+		}
+	}
 }
 
 void chooseCharacter(char username[], int score){
@@ -658,4 +676,59 @@ void updateCharacter(int ID, char username[], int score){
 		}
 		curr = curr->next;
 	}
+}
+
+void startGame(char username[], int score){
+	clearScreen();
+	char messages[] = "Commencing battle unit!...\n";
+	srand(time(NULL));
+	int randomNum = 1 + rand() % (7 - 1 + 1);
+}
+
+int main(){
+	int loop = 1, i;
+	while(loop == 1){
+		clearScreen();
+    	puts(" W                  .__. .__.      ");
+    	puts("[ ]                 |::| |::|           ");
+    	puts(" E          ._.     |::| |::|   ._.     ");
+    	puts(" |\\         |:| ._. |::| |::|   |/|     ");
+    	puts("  \\ \\|/     |:|_|/| |::| |::|_  |/|     ");
+    	puts("  |-( )-    |:|\"|/|_|::| |::|\\|_|/| _   ");
+    	puts("  | V L     |:|\"|/|||::| |::|\\|||/||:|  ");
+    	puts("  \\    `  ___   ~~~~~~~~~~~~~~~~~~~~~~~");
+    	puts("  \\    `  ___   ~~~~~~~~~~~~~~~~~~~~~~~");
+    	puts("========================================");
+    	puts("\n");
+    	puts("\x1b[36mWar of Elements: Eclipsia Wars\x1b[0m\n");
+    	puts("1. Login");
+    	puts("2. Sign up");
+    	puts("3. Exit");
+    	printf(">> ");
+    	int operation;
+    	scanf("%d", &operation);
+    	switch(operation){
+        	case 1:
+				loginMenu();
+				getchar();
+            	break;
+        	case 2:
+				signUpMenu();
+				getchar();
+            	break;
+        	case 3:
+            	clearScreen();
+            	char thankYou[] = "\x1b[33mThank you for playing!\x1b[0m";
+            	for(i = 0; thankYou[i] != '\0'; i++){
+                	printf("%c", thankYou[i]);
+                	usleep(100000);
+            	}
+				printf("\n");
+            	loop = 0;
+            	break;
+        	default:
+            	break;
+   		}
+	}
+    return 0;
 }
