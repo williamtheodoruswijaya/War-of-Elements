@@ -508,9 +508,6 @@ void updateScore(int score, char username[]){
 		struct userData* curr = head[i];
 		if(head[i] != NULL){
 			while(curr != NULL){
-				if(strcmp(curr->username, username) == 0){
-					curr->score = score;
-				}
 				fprintf(inputFile, "%s#%s#%d#%d\n", curr->username, curr->password, curr->score, curr->character);
 				curr = curr->next;
 			}
@@ -1036,7 +1033,8 @@ void battle(struct ClassPlayer* player, struct ClassEnemy* enemy, int score, int
 		printf("DEF: %d\n", player->def);
 		printf("\n");
 		printf("Press ENTER to continue!\n");
-		updateCharacter(ID, username, score);
+		int newScore = score + 100;
+		updateCharacter(ID, username, newScore);
 	}
 }
 
