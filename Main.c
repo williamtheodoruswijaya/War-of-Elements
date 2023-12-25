@@ -756,27 +756,27 @@ struct ClassEnemy* createEnemy(int id, char name[], char elements[], int hp, int
 	return enemy;
 }
 
-char* aliasEnemy(const char name[]){
+char* aliasEnemy(int id){
 	char *alias = (char*)malloc(sizeof(char) * 100);
-	if(strcmp(name, "\033[33;1mGro-goroth\033[0m ") == 0){
+	if(id == 1){
 		strcpy(alias, "God of Destruction");
 	}
-	if(strcmp(name, "\033[32;1mSylvian\033[0m ") == 0){
+	if(id == 2){
 		strcpy(alias, "The goddess of love and fertility");
 	}
-	if(strcmp(name, "\033[35;1mZeromus\033[0m ") == 0){
+	if(id == 3){
 		strcpy(alias, "God of Depth");
 	}
-	if(strcmp(name, "\033[37;1mRher\033[0m ") == 0){
+	if(id == 4){
 		strcpy(alias, "The trickster moon god");
 	}
-	if(strcmp(name, "\033[36;1mVinushka\033[0m ") == 0){
+	if(id == 5){
 		strcpy(alias, "God of Nature");
 	}
-	if(strcmp(name, "\033[32;43;1mGolem\033[0m ") == 0){
+	if(id == 6){
 		strcpy(alias, "The Forgotten One");
 	}
-	if(strcmp(name, "\033[37;1mAll-mer\033[0m ") == 0){
+	if(id == 7){
 		strcpy(alias, "The Ascended One");
 	}
 	else{
@@ -810,24 +810,29 @@ void attack(struct ClassPlayer* player, struct ClassEnemy* enemy){
 		printf("%c", playerName[i]);
 		usleep(25000);
 	}
+	usleep(25000);
 	char messages1[] = " attacked ";
 	for(int i = 0; messages1[i] != '\0'; i++){
 		printf("%c", messages1[i]);
 		usleep(25000);
 	}
+	usleep(25000);
 	for(int i = 0; enemyName[i] != '\0'; i++){
 		printf("%c", enemyName[i]);
 		usleep(25000);
 	}
+	usleep(25000);
 	char messages2[] = " with ";
 	for(int i = 0; messages2[i] != '\0'; i++){
 		printf("%c", messages2[i]);
 		usleep(25000);
 	}
+	usleep(25000);
 	for(int i = 0; damageString[i] != '\0'; i++){
 		printf("%c", damageString[i]);
 		usleep(25000);
 	}
+	usleep(25000);
 	char messages3[] = " damage!\n";
 	for(int i = 0; messages3[i] != '\0'; i++){
 		printf("%c", messages3[i]);
@@ -850,10 +855,12 @@ void defense(struct ClassPlayer* player, int maxDEF){
 		printf("%c", playerName[i]);
 		usleep(25000);
 	}
+	usleep(25000);
 	for(int i = 0; messages[i] != '\0'; i++){
 		printf("%c", messages[i]);
 		usleep(25000);
 	}
+	usleep(25000);
 	char increaseString[4];
 	sprintf(increaseString, "%d", increase);
 	for(int i = 0; increaseString[i] != '\0'; i++){
@@ -877,10 +884,12 @@ void heal(struct ClassPlayer* player, int maxHP){
 		printf("%c", playerName[i]);
 		usleep(25000);
 	}
+	usleep(25000);
 	for(int i = 0; messages[i] != '\0'; i++){
 		printf("%c", messages[i]);
 		usleep(25000);
 	}
+	usleep(25000);
 	char increaseString[4];
 	sprintf(increaseString, "%d", increase);
 	for(int i = 0; increaseString[i] != '\0'; i++){
@@ -900,7 +909,7 @@ void specialAttack(struct ClassPlayer* player, struct ClassEnemy* enemy, int max
 	}
 	if(player->hp < maxHP){
 		damage = 0;
-		printf("\033[1;31mYou can't use this skill!\033[0m\ ");
+		printf("\033[1;31mCan't use skill!\033[0m\ ");
 		printf("\n");
 	}
 	enemy->hp -= damage;
@@ -916,24 +925,29 @@ void specialAttack(struct ClassPlayer* player, struct ClassEnemy* enemy, int max
 		printf("%c", playerName[i]);
 		usleep(25000);
 	}
+	usleep(25000);
 	char messages1[] = " attacked ";
 	for(int i = 0; messages1[i] != '\0'; i++){
 		printf("%c", messages1[i]);
 		usleep(25000);
 	}
+	usleep(25000);
 	for(int i = 0; enemyName[i] != '\0'; i++){
 		printf("%c", enemyName[i]);
 		usleep(25000);
 	}
+	usleep(25000);
 	char messages2[] = " with ";
 	for(int i = 0; messages2[i] != '\0'; i++){
 		printf("%c", messages2[i]);
 		usleep(25000);
 	}
+	usleep(25000);
 	for(int i = 0; damageString[i] != '\0'; i++){
 		printf("%c", damageString[i]);
 		usleep(25000);
 	}
+	usleep(25000);
 	char messages3[] = " Ult!\n";
 	for(int i = 0; messages3[i] != '\0'; i++){
 		printf("%c", messages3[i]);
@@ -945,7 +959,7 @@ void specialAttack(struct ClassPlayer* player, struct ClassEnemy* enemy, int max
 void battle(struct ClassPlayer* player, struct ClassEnemy* enemy, int score, int bossMaxHP, int bosMaxDef, char username[], int ID){
 	int loop = 1, i, win = 0;
 	int playerTurn, enemyTurn;
-	char *alias = aliasEnemy(enemy->name);
+	char *alias = aliasEnemy(enemy->ID);
 
 	while(loop == 1){
 		clearScreen();
@@ -999,7 +1013,7 @@ void battle(struct ClassPlayer* player, struct ClassEnemy* enemy, int score, int
 		}
 		printf("Boss's turn!\n");
 		srand(time(NULL));
-		enemyTurn = 1 + rand() % (4 - 1 + 1);
+		enemyTurn = 1 + rand() % (3 - 1 + 1);
 		switch(enemyTurn){
 			case 1:
 				attack(enemy, player);
@@ -1009,9 +1023,6 @@ void battle(struct ClassPlayer* player, struct ClassEnemy* enemy, int score, int
 				break;
 			case 3:
 				heal(enemy, bossMaxHP);
-				break;
-			case 4:
-				specialAttack(enemy, player, bossMaxHP);
 				break;
 			default:
 				break;
